@@ -24,16 +24,20 @@ describe("Create Category", () => {
   });
 
   it("should not be able to create a new category with same name", async () => {
-    expect(async () => {
       const category = {
         name: "Category Test",
         description: "Category description Test"
       }
   
-      await createCategoryUseCase.execute(category);
-      await createCategoryUseCase.execute(category);
-  
-      const categoryCreated = await categoriesRepositoryInMemory.findByName(category.name);
-    }).rejects.toBeInstanceOf(AppError);
+      await createCategoryUseCase.execute({
+        name: category.name,
+        description: category.description
+      });
+      await expect(
+        createCategoryUseCase.execute({
+          name: category.name,
+          description: category.description
+        })
+      ).rejects.toEqual(new AppError("Category already exists!"));
   });
 })
